@@ -97,9 +97,13 @@ def js(func):
 class JSFunc(object):
     def __init__(self, func):
         self._ast = ast.parse(inspect.getsource(func))
+        self._orig = func
 
     def __str__(self):
         return _to_str(self._ast.body[0].body)
+
+    def __call__(self, *args, **kwargs):
+        return self._orig(*args, **kwargs)
 
 
 def _parse_assign(node):
