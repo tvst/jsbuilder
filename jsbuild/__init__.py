@@ -135,6 +135,13 @@ def _parse_call(node):
     )
 
 
+def _parse_map(node):
+    keys = _to_str_iter(node.keys)
+    values = _to_str_iter(node.values)
+    kvs = zip(keys, values)
+    return "new Map([%s])" % ",".join("[%s, %s]" % kv for kv in kvs)
+
+
 # See:
 # - https://docs.python.org/3/library/ast.html
 # - https://greentreesnakes.readthedocs.io/en/latest/nodes.html
@@ -146,9 +153,9 @@ _PARSERS = {
     "Return": "return %(value)s",
     "Delete": "delete %(targets)s",
     "Assign": _parse_assign,
-    #"AugAssign": _parse_aug_assign,
+    "AugAssign": "%(target)s %(op)s= %(value)s",
     #"AnnAssign":
-    #"For": _parse_for,
+    "For": "%(iter)s.forEach((%(target)s, _i) => {\n%(body)s\n})",
     #"AsyncFor":
     "While": "while (%(test)s) {\n%(body)s\n}",
     "If": "if (%(test)s) {\n%(body)s\n} else {\n%(orelse)s\n}",
@@ -166,12 +173,12 @@ _PARSERS = {
     "Expr": "%(value)s",
     "Pass": "",
     "BoolOp": _parse_bool_op,
-    #"NamedExpr": _parse_named_expr,
+    #"NamedExpr":
     "BinOp": "(%(left)s %(op)s %(right)s)",
     "UnaryOp": "(%(op)s%(operand)s)",
     "Lambda": "((%(args)s) => (%(body)s))",
     "IfExp": "(%(test)s) ? (%(body)s) : (%(orelse)s)",
-    #"Dict":
+    "Dict": _parse_map,
     #"Set":
     #"ListComp":
     #"SetComp":
@@ -190,10 +197,10 @@ _PARSERS = {
     #"Starred":
     "Name": "%(raw_id)s",
     "List": lambda l: "[%s]" % ', '.join(_to_str(x) for x in l.elts),
-    #"Tuple": _parse_tuple,
+    #"Tuple":
     #"AugLoad":
     #"AugStore":
-    #"Param": _parse_param,
+    #"Param":
     #"Slice":
     #"ExtSlice":
     "Index": "%(value)s",
