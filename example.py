@@ -1,4 +1,4 @@
-from jsbuilder import js
+from jsbuild import js
 
 
 @js

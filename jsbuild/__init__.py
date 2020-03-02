@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-jsbuilder -- write JavaScript in Python
+jsbuild -- write JavaScript in Python
 ==================================
 
 Just annotate a Python function with `@js` and then call `str()` on it to get
@@ -22,7 +22,7 @@ a fully-working JavaScript version of that function.
 Example
 -------
 
->>> from jsbuilder import js
+>>> from jsbuild import js
 >>>
 >>> @js
 ... def js_code():
