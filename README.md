@@ -167,3 +167,34 @@ function flatten(root) {
     return {"children": nodes}
 }
 ```
+
+# Support
+
+Some Python features are not yet supported (like `assert` and `async`) and others will likely never be, since they don't have an obvious analogue in JS (like slices, and the `in` operator).
+
+For a full list, see the [source code](https://github.com/tvst/jsbuild/blob/master/jsbuild/__init__.py#L150).
+
+## For loops
+
+`For` loops are a tricky one! They're supported, but Python and JS have a different enough syntaxes for `for` loops that a perfect conversion isn't possible. Instead, Python's `for` is being mapped to JS's `.forEach()`. So you can do:
+
+```py
+for word in ["hello", "hi", "whattup"]:
+  console.log(word)
+```
+
+...since that translates to:
+
+```js
+["hello", "hi", "whattup"].forEach(word => console.log(word))
+```
+
+And note that if you're using things like `range()` and `enumerate()`, those don't exist in JS so you'll have to define them first. For example:
+
+```py
+def range(n):
+  return Array.from(Array(5).keys())
+  
+for i in range(10):
+  console.log(i)
+```
