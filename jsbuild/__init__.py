@@ -135,11 +135,11 @@ def _parse_call(node):
     )
 
 
-def _parse_map(node):
+def _parse_dict(node):
     keys = _to_str_iter(node.keys)
     values = _to_str_iter(node.values)
     kvs = zip(keys, values)
-    return "new Map([%s])" % ",".join("[%s, %s]" % kv for kv in kvs)
+    return "{%s}" % ", ".join("%s: %s" % kv for kv in kvs)
 
 
 # See:
@@ -149,7 +149,7 @@ _PARSERS = {
     #"Module":
     "FunctionDef": "function %(raw_name)s(%(args)s) {\n%(body)s\n}",
     #"AsyncFunctionDef":
-    #"ClassDef": _parse_class_def,  # Need to figure out "new" JS keyword.
+    #"ClassDef": _parse_class_def,  # TODO: Need to figure out "new" JS keyword.
     "Return": "return %(value)s",
     "Delete": "delete %(targets)s",
     "Assign": _parse_assign,
@@ -162,9 +162,9 @@ _PARSERS = {
     #"With":
     #"AsyncWith":
     "Raise": "throw new Error('%(exc)s')",
-    #"Try": _parse_try,
-    #"TryFinally": _parse_try_finally,
-    #"TryExcept": _parse_try_except,
+    #"Try": TODO _parse_try,
+    #"TryFinally": TODO _parse_try_finally,
+    #"TryExcept": TODO _parse_try_except,
     #"Assert":
     #"Import":
     #"ImportFrom":
@@ -178,7 +178,7 @@ _PARSERS = {
     "UnaryOp": "(%(op)s%(operand)s)",
     "Lambda": "((%(args)s) => (%(body)s))",
     "IfExp": "(%(test)s) ? (%(body)s) : (%(orelse)s)",
-    "Dict": _parse_map,
+    "Dict": _parse_dict,
     #"Set":
     #"ListComp":
     #"SetComp":
@@ -197,7 +197,7 @@ _PARSERS = {
     #"Starred":
     "Name": "%(raw_id)s",
     "List": lambda l: "[%s]" % ', '.join(_to_str(x) for x in l.elts),
-    #"Tuple":
+    #"Tuple": TODO
     #"AugLoad":
     #"AugStore":
     #"Param":
