@@ -88,6 +88,7 @@ node.append("text").text(((d) => (d.name))).style("font-size", ((d) => ((Math.mi
 
 import inspect
 import ast
+import textwrap
 
 
 def js(func):
@@ -96,7 +97,8 @@ def js(func):
 
 class JSFunc(object):
     def __init__(self, func):
-        self._ast = ast.parse(inspect.getsource(func))
+        source_code = inspect.getsource(func)
+        self._ast = ast.parse(textwrap.dedent(source_code))
         self._orig = func
 
     def __str__(self):
