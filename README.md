@@ -1,9 +1,16 @@
-# jsbuild — write JavaScript in Python
+# jsbuild — convert Python code to JavaScript strings
 
 Just annotate a Python function with `@js` and then call `str()` on it to get
-a fully-working JavaScript version of that function.
+a fully-working JavaScript version of that function. Why? _Because why not._
 
-## Examples
+(If you like this, check out [htbuild](https://github.com/tvst/htbuild). It's the
+HTML equivalent of jsbuild: an HTML string builder for Python folks who don't
+like templating languages.)
+
+## Example
+
+Here's some code that was copy/pasted directly from the D3 documentation,
+then converted to Python:
 
 ```
 from jsbuild import js
@@ -49,4 +56,6 @@ def js_code():
 ```
 
 Now you can just call `str()` or `print()` on `js_code` to see the JavaScript
-version of that function:
+version of that function!
+
+Don't believe me? Check out our unit tests.
