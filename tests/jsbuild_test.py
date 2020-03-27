@@ -38,6 +38,31 @@ class TestHtBuild(unittest.TestCase):
         expected = 'a = 10'
         self.assertEqual(actual, expected)
 
+    def test_for_range(self):
+        @js
+        def js_code():
+            def range(n):
+                return Array['from'](Array(5).keys())
+
+            for i in range(10):
+                console.log(i)
+
+        actual = str(js_code)
+        expected = '''
+            function range(n) {
+                return Array["from"](Array(5).keys())
+            };
+
+            range(10).forEach((i, _i) => {
+                console.log(i)
+            })
+        '''
+
+        self.assertEqual(
+            remove_whitespace(actual),
+            remove_whitespace(expected),
+        )
+
     def test_simple_example(self):
         @js
         def js_code():
