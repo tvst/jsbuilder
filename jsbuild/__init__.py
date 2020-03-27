@@ -264,6 +264,9 @@ def _to_str(node):
     if node_type in (int, float):
         return str(node)
 
+    if node_type is bool:
+        return "true" if node else "false"
+
     if node_type.__name__ not in _PARSERS:
         raise Exception("Unsupported operation in JS: %s" % node_type)
 
