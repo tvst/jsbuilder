@@ -110,7 +110,7 @@ class TestHtBuild(unittest.TestCase):
 
             function json_read(js, error, json) {
                 if (error) {
-                    throw new Error(\'error\')
+                    throw new Error(error)
                 } else {
                 };
                 node = svg.selectAll(".node")

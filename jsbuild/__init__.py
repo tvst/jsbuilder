@@ -163,7 +163,7 @@ _PARSERS = {
     "If": "if (%(test)s) {\n%(body)s\n} else {\n%(orelse)s\n}",
     #"With":
     #"AsyncWith":
-    "Raise": "throw new Error('%(exc)s')",
+    "Raise": "throw new Error(%(exc)s)",
     #"Try": TODO _parse_try,
     #"TryFinally": TODO _parse_try_finally,
     #"TryExcept": TODO _parse_try_except,
