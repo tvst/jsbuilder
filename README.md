@@ -106,8 +106,7 @@ def js_code():
         return {"children": nodes}
 ```
 
-Now you can just call `str(js_code)` or `print(js_code)` to see the JavaScript
-version of that code:
+And the JS-converted version is:
 
 ```js
 bleed = 100;
