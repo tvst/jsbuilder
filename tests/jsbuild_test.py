@@ -38,7 +38,42 @@ class TestHtBuild(unittest.TestCase):
         expected = 'a = 10'
         self.assertEqual(actual, expected)
 
-    def test_complex_code(self):
+    def test_simple_example(self):
+        @js
+        def js_code():
+
+          def sum_and_check_if_42(a, b):
+            c = a + b
+            if c == 42:
+              return True
+            else:
+              return False
+
+          result = sum_and_check_if_42(10, 30)
+          console.log("Is it 42?", result)
+
+        actual = str(js_code)
+        expected = '''
+        function sum_and_check_if_42(a, b) {
+          c = (a + b);
+
+          if (c === 42) {
+            return true
+          } else {
+            return false
+          }
+        };
+
+        result = sum_and_check_if_42(10, 30);
+        console.log("Is it 42?", result)
+        '''
+
+        self.assertEqual(
+            remove_whitespace(actual),
+            remove_whitespace(expected)
+        )
+
+    def test_complex_example(self):
         @js
         def js_code():
             bleed = 100
