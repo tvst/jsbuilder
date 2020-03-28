@@ -195,7 +195,7 @@ And note that if you're using things like `range()` and `enumerate()`, those don
 
 ```py
 def range(n):
-  return Array['from'](Array(5).keys())
+  return Array['from'](Array(n).keys())
   
 for i in range(10):
   console.log(i)
@@ -205,7 +205,7 @@ for i in range(10):
 
 ```js
 function range(n) {
-    return Array["from"](Array(5).keys())
+    return Array["from"](Array(n).keys())
 };
 
 range(10).forEach((i, _i) => {
