@@ -16,7 +16,7 @@ import re
 
 import unittest
 
-from jsbuild import js
+from jsbuilder import js
 
 
 class TestHtBuild(unittest.TestCase):

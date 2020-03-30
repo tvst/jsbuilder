@@ -1,16 +1,24 @@
-# jsbuild — convert Python code to JavaScript strings
+# jsbuilder — convert Python code to JavaScript strings
 
 Just annotate a Python function with `@js` and then call `str()` on it to get
 a fully-working JavaScript version of that function. Why? _Because why not._
 
 (If you like this, check out [htbuild](https://github.com/tvst/htbuild). It's the
-HTML equivalent of jsbuild: an HTML string builder for Python folks who don't
+HTML equivalent of jsbuilder: an HTML string builder for Python folks who don't
 like templating languages.)
+
+## Installation
+
+Just PIP it!
+
+```py
+pip install jsbuilder
+```
 
 ## Simple Example
 
 ```py
-from jsbuild import js
+from jsbuilder import js
 
 @js
 def js_code():
@@ -52,7 +60,7 @@ Here's some code that was copy/pasted directly from the D3 documentation,
 then converted to Python:
 
 ```py
-from jsbuild import js
+from jsbuilder import js
 
 @js
 def js_code():
@@ -172,7 +180,7 @@ function flatten(root) {
 
 Some Python features are not yet supported (like `assert` and `async`) and others will likely never be, since they don't have an obvious analogue in JS (like slices, and the `in` operator).
 
-For a full list, see the [source code](https://github.com/tvst/jsbuild/blob/master/jsbuild/__init__.py#L150).
+For a full list, see the [source code](https://github.com/tvst/jsbuilder/blob/master/jsbuilder/__init__.py#L150).
 
 ## For loops
 
@@ -194,7 +202,7 @@ And note that if you're using things like `range()` and `enumerate()`, those don
 ```py
 def range(n):
   return Array.from(Array(5).keys())
-  
+
 for i in range(10):
   console.log(i)
 ```
