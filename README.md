@@ -182,6 +182,8 @@ Some Python features are not yet supported (like `assert` and `async`) and other
 
 For a full list, see the [source code](https://github.com/tvst/jsbuilder/blob/master/jsbuilder/__init__.py#L150).
 
+Also note that Python has some keywords like `from` that are not keywords in JavaScript, so you cannot use those directly in your code for things like variable names and object members. If you really need to, you'll have to find work-arounds. For example, instead of `Array.from()` you'll have to use `Array['from']()`.
+
 ## For loops
 
 `For` loops are a tricky one! They're supported, but Python and JS have a different enough syntaxes for `for` loops that a perfect conversion isn't possible. Instead, Python's `for` is being mapped to JS's `.forEach()`. So you can do:
@@ -201,8 +203,20 @@ And note that if you're using things like `range()` and `enumerate()`, those don
 
 ```py
 def range(n):
-  return Array.from(Array(5).keys())
+  return Array['from'](Array(n).keys())
 
 for i in range(10):
   console.log(i)
+```
+
+...which translates to:
+
+```js
+function range(n) {
+    return Array["from"](Array(n).keys())
+};
+
+range(10).forEach((i, _i) => {
+    console.log(i)
+})
 ```
