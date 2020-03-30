@@ -83,6 +83,31 @@ class TestHtBuild(unittest.TestCase):
         '''
         self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
 
+    def test_declaration_in_if_statement(self):
+        @js
+        def js_code():
+            a = 0
+
+            if cond:
+                a = 10
+                b = 20
+            else:
+                a = 1
+                b = 2
+
+        actual = str(js_code)
+        expected = '''
+            var a = 0;
+            if (cond) {
+                a = 10;
+                var b = 20
+            } else {
+                a = 1;
+                b = 2
+            }
+        '''
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
+
     def test_for_range(self):
         @js
         def js_code():

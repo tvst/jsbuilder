@@ -222,3 +222,88 @@ range(10).forEach((i, _i) => {
 ```
 
 Related: did you notice how you get a free `_i` variable in the JS version of the `for`/`forEach` loop? Feel free to use that variable inside the Python version of your JS code, since `enumerate()` doesn't work!
+
+## Variable declarations
+
+Code like this in Python gets translated correctly to JS:
+
+```py
+# Python
+a = 0
+a = 10
+```
+
+```js
+// JavaScript
+var a = 0;
+a = 10
+```
+
+And so do slightly more complex cases like:
+
+```py
+# Python
+def foo(b):
+  a = 0
+  a = b = c = 10
+```
+
+```js
+// JavaScript
+function foo(b) {
+  var a = 0;
+  a = 10;
+  b = 10;
+  var c = 10
+}
+```
+
+However, because of the way Python and JS variable hoisting work, variable
+declarations in places like `if`/`else` blocks are not handled differently in
+the two worlds. In particular, this Python code
+
+```py
+if x:
+  a = 10
+else:
+  a = 100
+```
+
+becomes this JS code
+
+```js
+if (x) {
+  var a = 10
+} else {
+  a = 100
+}
+```
+
+...which is correct, but rather odd!
+
+If for any reason you need to solve this, just declare the variable above the
+`if`:
+
+
+```py
+# Python
+
+a = None
+
+if x:
+  a = 10
+else:
+  a = 100
+```
+
+```js
+// JavaScript
+
+var a = null
+
+if (x) {
+  a = 10
+} else {
+  a = 100
+}
+```
