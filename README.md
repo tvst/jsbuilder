@@ -186,7 +186,7 @@ Also note that Python has some keywords like `from` that are not keywords in Jav
 
 ## For loops
 
-`For` loops are a tricky one! They're supported, but Python and JS have a different enough syntaxes for `for` loops that a perfect conversion isn't possible. Instead, Python's `for` is being mapped to JS's `.forEach()`. So you can do:
+`For` loops are a tricky one! They're supported, but Python and JS have different enough syntaxes for `for` loops that a perfect conversion isn't possible. Instead, Python's `for` is being mapped to JS's `.forEach()`. So you can do:
 
 ```py
 for word in ["hello", "hi", "whattup"]:
@@ -196,7 +196,7 @@ for word in ["hello", "hi", "whattup"]:
 ...since that translates to:
 
 ```js
-["hello", "hi", "whattup"].forEach(word => console.log(word))
+["hello", "hi", "whattup"].forEach((word, _i) => console.log(word))
 ```
 
 And note that if you're using things like `range()` and `enumerate()`, those don't exist in JS so you'll have to define them first. For example:
@@ -220,3 +220,5 @@ range(10).forEach((i, _i) => {
     console.log(i)
 })
 ```
+
+Related: did you notice how you get a free `_i` variable in the JS version of the `for`/`forEach` loop? Feel free to use that variable inside the Python version of your JS code, since `enumerate()` doesn't work!
