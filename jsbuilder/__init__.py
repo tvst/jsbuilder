@@ -102,46 +102,86 @@ class JSFunc(object):
         self._orig = func
 
     def __str__(self):
-        return _to_str(self._ast.body[0].body)
+        return _to_str(self._ast.body[0].body, _Scope())
 
     def __call__(self, *args, **kwargs):
         return self._orig(*args, **kwargs)
 
 
-def _parse_assign(node):
-    targets = " = ".join(_to_str_iter(node.targets))
-    return "%s = %s" % (targets, _to_str(node.value))
+def _parse_assign(node, scope):
+    value = _to_str(node.value, scope)
+    target_iter = _to_str_iter(node.targets, scope)
+
+    assignments = []
+
+    for t in target_iter:
+        if t in scope:
+            assignments.append(f"{t} = {value}")
+        else:
+            scope.add(t)
+            assignments.append(f"var {t} = {value}")
+
+    return ";".join(assignments)
 
 
-def _parse_bool_op(node):
-    op = _to_str(node.op)
-    return op.join(_to_str_iter(node.values))
+def _parse_bool_op(node, scope):
+    op = _to_str(node.op, scope)
+    return op.join(_to_str_iter(node.values, scope))
 
 
-def _parse_compare(node):
-    ops = _to_str_iter(node.ops)
-    comparators = _to_str_iter(node.comparators)
+def _parse_compare(node, scope):
+    ops = _to_str_iter(node.ops, scope)
+    comparators = _to_str_iter(node.comparators, scope)
     ops_comps = zip(ops, comparators)
     return "%s %s" % (
-        _to_str(node.left),
+        _to_str(node.left, scope),
         " ".join("%s %s" % oc for oc in ops_comps),
     )
 
 
-def _parse_call(node):
-    func = _to_str(node.func)
-    args = _to_str_iter(node.args)
+def _parse_call(node, scope):
+    func = _to_str(node.func, scope)
+    args = _to_str_iter(node.args, scope)
     return "%s(%s)" % (
         func,
         ", ".join(args),
     )
 
 
-def _parse_dict(node):
-    keys = _to_str_iter(node.keys)
-    values = _to_str_iter(node.values)
+def _parse_dict(node, scope):
+    keys = _to_str_iter(node.keys, scope)
+    values = _to_str_iter(node.values, scope)
     kvs = zip(keys, values)
     return "{%s}" % ", ".join("%s: %s" % kv for kv in kvs)
+
+
+def _parse_function_def(node, scope):
+    new_scope = scope.enter_new()
+    new_scope.add(x.arg for x in node.args.args)
+
+    return "function %(name)s(%(args)s) {\n%(body)s\n}" % {
+        "name": node.name,
+        "args": _to_str(node.args, new_scope),
+        "body": _to_str(node.body, new_scope),
+    }
+
+
+def _parse_lambda(node, scope):
+    new_scope = scope.enter_new()
+    new_scope.add(x.arg for x in node.args.args)
+
+    return "((%(args)s) => (%(body)s))" % {
+        "args": _to_str(node.args, new_scope),
+        "body": _to_str(node.body, new_scope),
+    }
+
+
+def _parse_list(node, scope):
+    return "[%s]" % ", ".join(_to_str(x, scope) for x in node.elts)
+
+
+def _parse_arguments(node, scope):
+    return ", ".join(x.arg for x in node.args)
 
 
 # See:
@@ -149,7 +189,7 @@ def _parse_dict(node):
 # - https://greentreesnakes.readthedocs.io/en/latest/nodes.html
 _PARSERS = {
     #"Module":
-    "FunctionDef": "function %(raw_name)s(%(args)s) {\n%(body)s\n}",
+    "FunctionDef": _parse_function_def,
     #"AsyncFunctionDef":
     #"ClassDef": _parse_class_def,  # TODO: Need to figure out "new" JS keyword.
     "Return": "return %(value)s",
@@ -178,7 +218,7 @@ _PARSERS = {
     #"NamedExpr":
     "BinOp": "(%(left)s %(op)s %(right)s)",
     "UnaryOp": "(%(op)s%(operand)s)",
-    "Lambda": "((%(args)s) => (%(body)s))",
+    "Lambda": _parse_lambda,
     "IfExp": "(%(test)s) ? (%(body)s) : (%(orelse)s)",
     "Dict": _parse_dict,
     #"Set":
@@ -198,7 +238,7 @@ _PARSERS = {
     "Subscript": "%(value)s[%(slice)s]",
     #"Starred":
     "Name": "%(raw_id)s",
-    "List": lambda l: "[%s]" % ', '.join(_to_str(x) for x in l.elts),
+    "List": _parse_list,
     #"Tuple": TODO
     #"AugLoad":
     #"AugStore":
@@ -238,7 +278,7 @@ _PARSERS = {
     #"ExceptHandler": _parse_except_handler,
     "Break": "break",
     "Continue": "continue",
-    "arguments": lambda arguments: ', '.join(x.arg for x in arguments.args),
+    "arguments": _parse_arguments,
 
     # For Python < 3.8
     "Num": "%(n)s",
@@ -249,11 +289,11 @@ _PARSERS = {
 }
 
 
-def _to_str(node):
+def _to_str(node, scope):
     node_type = type(node)
 
     if node_type is list:
-        return ';\n'.join(_to_str(x) for x in node)
+        return ";\n".join(_to_str(x, scope) for x in node)
 
     if node is None:
         return "null"
@@ -273,15 +313,16 @@ def _to_str(node):
     parser = _PARSERS[node_type.__name__]
 
     if type(parser) is str:
-        return parser % _DictWrapper(node.__dict__)
+        return parser % _DictWrapper(node.__dict__, scope)
 
-    return parser(node)
+    return parser(node, scope)
 
 
 class _DictWrapper(dict):
-    def __init__(self, dikt):
+    def __init__(self, dikt, scope):
         self._dict = dikt
         self._parsed_keys = set()
+        self._scope = scope
 
     def __getitem__(self, k):
         raw = False
@@ -294,11 +335,33 @@ class _DictWrapper(dict):
             if raw:
                 self._dict[k] = self._dict[k]
             else:
-                self._dict[k] = _to_str(self._dict[k])
+                self._dict[k] = _to_str(self._dict[k], self._scope)
             self._parsed_keys.add(k)
 
         return self._dict[k]
 
 
-def _to_str_iter(arg):
-    return (_to_str(x) for x in arg)
+def _to_str_iter(arg, scope):
+    return (_to_str(x, scope) for x in arg)
+
+
+class _Scope(object):
+    def __init__(self, parent=None):
+        self._parent = parent
+        self._identifiers = set()
+
+    def enter_new(self):
+        return _Scope(self)
+
+    def add(self, identifiers):
+        for x in identifiers:
+            self._identifiers.add(x)
+
+    def __contains__(self, x):
+        if x in self._identifiers:
+            return True
+
+        if self._parent is not None and x in self._parent:
+            return True
+
+        return False

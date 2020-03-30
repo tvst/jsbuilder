@@ -29,14 +29,59 @@ class TestHtBuild(unittest.TestCase):
         expected = ''
         self.assertEqual(actual, expected)
 
-    def test_simple_assignment(self):
+    def test_simple_var_initialization(self):
         @js
         def js_code():
             a = 10
 
         actual = str(js_code)
-        expected = 'a = 10'
-        self.assertEqual(actual, expected)
+        expected = 'var a = 10'
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
+
+    def test_simple_var_assignment(self):
+        @js
+        def js_code():
+            a = 10
+            a = 20
+
+        actual = str(js_code)
+        expected = 'var a = 10;a = 20'
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
+
+    def test_multiple_var_initialization(self):
+        @js
+        def js_code():
+            a = b = c = 10
+
+        actual = str(js_code)
+        expected = 'var a = 10;var b = 10;var c = 10'
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
+
+    def test_multiple_assignment_initialization(self):
+        @js
+        def js_code():
+            b = 0
+            a = b = c = 10
+
+        actual = str(js_code)
+        expected = 'var b = 0;var a = 10;b = 10;var c = 10'
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
+
+    def test_assignment_to_function_argument(self):
+        @js
+        def js_code():
+            def func(b):
+                a = b = c = 10
+
+        actual = str(js_code)
+        expected = '''
+            function func(b) {
+                var a = 10;
+                b = 10;
+                var c = 10
+            }
+        '''
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
 
     def test_for_range(self):
         @js
@@ -80,7 +125,7 @@ class TestHtBuild(unittest.TestCase):
         actual = str(js_code)
         expected = '''
         function sum_and_check_if_42(a, b) {
-          c = (a + b);
+          var c = (a + b);
 
           if (c === 42) {
             return true
@@ -89,7 +134,7 @@ class TestHtBuild(unittest.TestCase):
           }
         };
 
-        result = sum_and_check_if_42(10, 30);
+        var result = sum_and_check_if_42(10, 30);
         console.log("Is it 42?", result)
         '''
 
@@ -152,17 +197,17 @@ class TestHtBuild(unittest.TestCase):
 
         actual = str(js_code)
         expected = '''
-            bleed = 100;
-            width = 960;
-            height = 760;
+            var bleed = 100;
+            var width = 960;
+            var height = 760;
 
-            pack = d3.layout
+            var pack = d3.layout
                 .pack()
                 .sort(null)
                 .size([width, (height + (bleed * 2))])
                 .padding(2);
 
-            svg = d3.select("body")
+            var svg = d3.select("body")
                 .append("svg")
                 .attr("width", width).attr("height", height)
                 .append("g")
@@ -173,7 +218,7 @@ class TestHtBuild(unittest.TestCase):
                     throw new Error(error)
                 } else {
                 };
-                node = svg.selectAll(".node")
+                var node = svg.selectAll(".node")
                     .data(pack.nodes(flatten(json)))
                     .filter(((d) => ((!d.children))))
                     .enter()
@@ -196,7 +241,7 @@ class TestHtBuild(unittest.TestCase):
             d3.json("README.json", json_read);
 
             function flatten(root) {
-                nodes = [];
+                var nodes = [];
 
                 function recurse(node) {
                     if (node.children) {
