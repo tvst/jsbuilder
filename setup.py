@@ -5,14 +5,15 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="jsbuilder",
-    version="0.0.1",
+    version="0.0.2",
     author="Thiago Teixeira",
     author_email="me@thiagot.com",
-    description="write JavaScript in Python",
+    description="Convert Python code to JavaScript strings, just by decorating it with @js!",
+    license="Apache 2",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/tvst/jsbuilder",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=["tests", "tests.*"]),
     install_requires=["iteration_utilities"],
     classifiers=[
         "Programming Language :: Python :: 3",
