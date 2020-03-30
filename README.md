@@ -41,7 +41,7 @@ _(Note: the code below has been pretty-printed for clarity)_
 
 ```js
 function sum_and_check_if_42(a, b) {
-  c = (a + b);
+  var c = (a + b);
 
   if (c === 42) {
     return true
@@ -117,17 +117,17 @@ def js_code():
 And the JS-converted version is:
 
 ```js
-bleed = 100;
-width = 960;
-height = 760;
+var bleed = 100;
+var width = 960;
+var height = 760;
 
-pack = d3.layout
+var pack = d3.layout
     .pack()
     .sort(null)
     .size([width, (height + (bleed * 2))])
     .padding(2);
 
-svg = d3.select("body")
+var svg = d3.select("body")
     .append("svg")
     .attr("width", width).attr("height", height)
     .append("g")
@@ -138,7 +138,7 @@ function json_read(js, error, json) {
         throw new Error(error)
     } else {
     };
-    node = svg.selectAll(".node")
+    var node = svg.selectAll(".node")
         .data(pack.nodes(flatten(json)))
         .filter(((d) => ((!d.children))))
         .enter()
@@ -161,7 +161,7 @@ function json_read(js, error, json) {
 d3.json("README.json", json_read);
 
 function flatten(root) {
-    nodes = [];
+    var nodes = [];
 
     function recurse(node) {
         if (node.children) {
