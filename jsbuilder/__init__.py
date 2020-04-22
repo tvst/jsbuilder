@@ -282,7 +282,7 @@ _PARSERS = {
 
     # For Python < 3.8
     "Num": "%(n)s",
-    "Str": '"%(s)s"',
+    "Str": '%(s)s',
     "Bytes": '"%(s)s"',
     #"Ellipsis
     "NameConstant": "%(value)s",
