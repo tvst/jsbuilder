@@ -253,7 +253,7 @@ _PARSERS = {
     "Mult": "*",
     #"MatMult":
     "Div": "/",
-    "Mod": "%",
+    "Mod": "%%",  # Escape the "%" as "%%" since we call "%" on this string later.
     #"Pow":
     "LShift": "<<",
     "RShift": ">>",

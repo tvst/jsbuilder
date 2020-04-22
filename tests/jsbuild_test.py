@@ -286,6 +286,15 @@ class TestHtBuild(unittest.TestCase):
             remove_whitespace(expected)
         )
 
+    def test_mod_operator(self):
+        @js
+        def js_code():
+            a = 8 % 2
+
+        actual = str(js_code)
+        expected = 'var a = (8 % 2)'
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
+
 
 
 WHITESPACE = re.compile(r'\s+')
