@@ -115,7 +115,11 @@ def _parse_assign(node, scope):
     assignments = []
 
     for t in target_iter:
-        if t in scope:
+        is_in_scope = t in scope
+        is_field_assignment = '.' in t
+        is_arr_assignment = '[' in t
+
+        if is_in_scope or is_field_assignment or is_arr_assignment:
             assignments.append(f"{t} = {value}")
         else:
             scope.add(t)

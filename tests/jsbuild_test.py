@@ -83,6 +83,24 @@ class TestHtBuild(unittest.TestCase):
         '''
         self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
 
+    def test_field_assignment(self):
+        @js
+        def js_code():
+            foo.bar = 10
+
+        actual = str(js_code)
+        expected = 'foo.bar = 10'
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
+
+    def test_arr_assignment(self):
+        @js
+        def js_code():
+            foo['bar'] = 10
+
+        actual = str(js_code)
+        expected = 'foo["bar"] = 10'
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
+
     def test_declaration_in_if_statement(self):
         @js
         def js_code():
@@ -285,16 +303,6 @@ class TestHtBuild(unittest.TestCase):
             remove_whitespace(actual),
             remove_whitespace(expected)
         )
-
-    def test_mod_operator(self):
-        @js
-        def js_code():
-            a = 8 % 2
-
-        actual = str(js_code)
-        expected = 'var a = (8 % 2)'
-        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
-
 
 
 WHITESPACE = re.compile(r'\s+')
