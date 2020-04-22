@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="jsbuilder",
-    version="0.0.4",
+    version="0.0.5",
     author="Thiago Teixeira",
     author_email="me@thiagot.com",
     description="Convert Python code to JavaScript strings, just by decorating it with @js!",
