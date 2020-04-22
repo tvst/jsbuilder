@@ -304,6 +304,20 @@ class TestHtBuild(unittest.TestCase):
             remove_whitespace(expected)
         )
 
+    def test_closure(self):
+        @js(outside_int=10, outside_str="hello")
+        def js_code():
+            a = outside_var
+
+        actual = str(js_code)
+        expected = """
+            var outside_int = 10;
+            var outside_str = "hello";
+            var a = outside_var
+        """
+        self.assertEqual(remove_whitespace(actual), remove_whitespace(expected))
+
+
 
 WHITESPACE = re.compile(r'\s+')
 

@@ -91,18 +91,47 @@ import ast
 import textwrap
 
 
-def js(func):
-    return JSFunc(func)
+def js(func=None, **kwargs):
+    if kwargs:
+        def wrapped_js(func):
+            return JSFunc(func, kwargs)
+        return wrapped_js
+
+    elif func:
+        return JSFunc(func)
+
+    else:
+        raise ValueError("@js requires at least a function")
 
 
 class JSFunc(object):
-    def __init__(self, func):
-        source_code = inspect.getsource(func)
-        self._ast = ast.parse(textwrap.dedent(source_code))
+    def __init__(self, func, initial_scope={}):
         self._orig = func
+        self._initial_scope = initial_scope
+
+        source_code = inspect.getsource(func)
+        code_ast = ast.parse(textwrap.dedent(source_code))
+        self._code = code_ast.body[0].body
+
+        empty_scope = _Scope()
+        initial_code_py = '\n'.join(
+            "%s = %s" % (k, _to_str(v, empty_scope))
+            for (k, v) in self._initial_scope.items()
+        )
+
+        if initial_code_py:
+            initial_code_ast = ast.parse(textwrap.dedent(initial_code_py))
+            self._initial_code_js = _to_str(
+                initial_code_ast.body, empty_scope) + ";"
+        else:
+            self._initial_code_js = ""
+
 
     def __str__(self):
-        return _to_str(self._ast.body[0].body, _Scope())
+        return self._initial_code_js + _to_str(
+            self._code,
+            _Scope(self._initial_scope)
+        )
 
     def __call__(self, *args, **kwargs):
         return self._orig(*args, **kwargs)
