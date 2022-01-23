@@ -1,11 +1,11 @@
 import setuptools
 
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding='utf8') as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="jsbuilder",
-    version="0.1.0",
+    version="0.1.1",
     author="Thiago Teixeira",
     author_email="me@thiagot.com",
     description="Convert Python code to JavaScript strings, just by decorating it with @js!",
